@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ImprovedWorkRoutines.NPCs.Behavior;
 
+
 #if IL2CPP
 using Il2CppScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = Il2CppScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
@@ -9,7 +10,7 @@ using ScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = ScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #endif
 
-namespace ImprovedWorkRoutines.Patches
+namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
 {
     [HarmonyPatch(typeof(S1StartMixingStationBehaviour))]
     public class StartMixingStationBehaviourPatch
