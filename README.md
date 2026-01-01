@@ -2,7 +2,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/manzune/ImprovedWorkRoutines?include_prereleases&sort=semver)](https://github.com/manzune/ImprovedWorkRoutines/releases)
 
-A MelonLoader mod for Schedule1 that tries to improve the work routines of employees.
+A MelonLoader mod for Schedule1 that aims to improve the work routines of employees.
 
 ## Features
 
