@@ -2,14 +2,12 @@
 using UnityEngine;
 using MelonLoader;
 using System.Collections;
-using static UnityEngine.UI.Image;
 
 #if IL2CPP
 using Il2CppScheduleOne.Employees;
 using Il2CppScheduleOne.ObjectScripts;
 using Il2CppScheduleOne.ItemFramework;
 using Il2CppFishNet;
-using Il2CppInterop.Runtime;
 using S1StartMixingStationBehaviour = Il2CppScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #elif MONO
 using ScheduleOne.Employees;
@@ -20,7 +18,7 @@ using FishNet;
 using S1StartMixingStationBehaviour = ScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #endif
 
-namespace ImprovedWorkRoutines.NPCs.Behavior
+namespace ImprovedWorkRoutines.NPCs.Behaviour
 {
     public class StartMixingStationBehaviour
     {
@@ -34,29 +32,37 @@ namespace ImprovedWorkRoutines.NPCs.Behavior
 
         private object _routine;
 
-        private StartMixingStationBehaviour(S1StartMixingStationBehaviour original)
+        private StartMixingStationBehaviour(S1StartMixingStationBehaviour original, Chemist chemist)
         {
             _original = original;
-#if IL2CPP
-            _chemist = original.Npc.Cast<Chemist>();
-#elif MONO
-            _chemist = original.Npc as Chemist;
-#endif
+            _chemist = chemist;
         }
 
         public static StartMixingStationBehaviour RetrieveOrCreate(S1StartMixingStationBehaviour original)
         {
-            StartMixingStationBehaviour behavior = actives.Find(x => x._original == original);
+            StartMixingStationBehaviour behaviour = actives.Find(x => x._original == original);
 
-            if (behavior == null)
+            if (behaviour == null)
             {
-                behavior = new(original);
-                actives.Add(behavior);
+#if IL2CPP
+                Chemist chemist = original.Npc.TryCast<Chemist>();
+#elif MONO
+                Chemist chemist = original.Npc as Chemist;
+#endif
+                if (chemist != null)
+                {
+                    behaviour = new(original, chemist);
+                    actives.Add(behaviour);
 
-                Utils.Logger.Debug("StartMixingStationBehaviour", $"Created for: {original.Npc.fullName}");
+                    Utils.Logger.Debug("StartMixingStationBehaviour", $"Created for: {original.Npc.fullName}");
+                }
+                else
+                {
+                    return null;
+                }
             }
 
-            return behavior;
+            return behaviour;
         }
 
         public void AssignStation(MixingStation station)

@@ -1,15 +1,17 @@
 ﻿using HarmonyLib;
-using ImprovedWorkRoutines.NPCs.Behavior;
+using ImprovedWorkRoutines.NPCs.Behaviour;
 
 #if IL2CPP
+using Il2CppScheduleOne.Employees;
 using Il2CppScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = Il2CppScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #elif MONO
+using ScheduleOne.Employees;
 using ScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = ScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #endif
 
-namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
+namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
 {
     [HarmonyPatch(typeof(S1StartMixingStationBehaviour))]
     public class StartMixingStationBehaviourPatch
@@ -21,7 +23,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
             if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.RpcLogic___StartCook_2166136261();
+                modified?.RpcLogic___StartCook_2166136261();
 
                 return false;
             }
@@ -46,7 +48,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
             if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.AssignStation(station);
+                modified?.AssignStation(station);
             }
         }
 
@@ -57,7 +59,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
             if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.StopCook();
+                modified?.StopCook();
             }
         }
     }
