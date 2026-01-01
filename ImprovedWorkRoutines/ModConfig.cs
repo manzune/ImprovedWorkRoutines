@@ -20,10 +20,10 @@ namespace ImprovedWorkRoutines
 
         public struct Chemist
         {
-            public static float InsertIngredientBaseTime
+            public static float InsertIngredientTime
             {
-                get => chemistCategory.GetEntry<float>("InsertIngredientBaseTime").Value;
-                set => chemistCategory.GetEntry<float>("InsertIngredientBaseTime").Value = value;
+                get => chemistCategory.GetEntry<float>("InsertIngredientTime").Value;
+                set => chemistCategory.GetEntry<float>("InsertIngredientTime").Value = value;
             }
         }
 
@@ -69,7 +69,7 @@ namespace ImprovedWorkRoutines
             // Chemist
             chemistCategory.CreateEntry<float>
             (
-                identifier: "InsertIngredientBaseTime",
+                identifier: "InsertIngredientTime",
                 default_value: 1f,
                 display_name: "Insert Ingredient Base Time",
                 description: "Time a chemist needs per ingredient to insert it.",

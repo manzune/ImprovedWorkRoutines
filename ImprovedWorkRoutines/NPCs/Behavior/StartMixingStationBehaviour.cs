@@ -105,7 +105,7 @@ namespace ImprovedWorkRoutines.NPCs.Behavior
 
                     for (int i = 0; i < mixQuantity; i++)
                     {
-                        yield return new WaitForSeconds(ModConfig.Chemist.InsertIngredientBaseTime);
+                        yield return new WaitForSeconds(ModConfig.Chemist.InsertIngredientTime);
                     }
 
                     if (InstanceFinder.IsServer)
