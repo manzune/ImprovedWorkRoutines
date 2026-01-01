@@ -144,7 +144,6 @@
 		<Copy SourceFiles=".\bin\Il2Cpp\net6.0\ImprovedWorkRoutines.dll" DestinationFiles="$(NexusDeploymentPath)\Mods\ImprovedWorkRoutines.Il2Cpp.dll" />
 		<Copy SourceFiles=".\bin\Il2Cpp\net6.0\ImprovedWorkRoutines.dll" DestinationFiles="$(ThunderstoreDeploymentPath)\Mods\ImprovedWorkRoutines.Il2Cpp.dll" />
 		<Copy SourceFiles=".\bin\Il2Cpp\net6.0\ImprovedWorkRoutines.dll" DestinationFiles="$(Il2CppGamePath)\Mods\ImprovedWorkRoutines.Il2Cpp.dll" />
-		<Copy SourceFiles=".\bin\Il2Cpp\net6.0\ImprovedWorkRoutines.dll" DestinationFiles="$(RemoteDeploymentPath)\Mods\ImprovedWorkRoutines.Il2Cpp.dll" Condition="'$(SendToRemote)' == 'true'" />
 	</Target>
 
 	<Target Name="PostBuildMono" AfterTargets="Build" Condition="'$(AutomateLocalDeployment)' == 'true' and '$(Configuration)' == 'Mono'">
@@ -152,7 +151,6 @@
 		<Copy SourceFiles=".\bin\Mono\netstandard2.1\ImprovedWorkRoutines.dll" DestinationFiles="$(NexusDeploymentPath)\Mods\ImprovedWorkRoutines.Mono.dll" />
 		<Copy SourceFiles=".\bin\Mono\netstandard2.1\ImprovedWorkRoutines.dll" DestinationFiles="$(ThunderstoreDeploymentPath)\Mods\ImprovedWorkRoutines.Mono.dll" />
 		<Copy SourceFiles=".\bin\Mono\netstandard2.1\ImprovedWorkRoutines.dll" DestinationFiles="$(MonoGamePath)\Mods\ImprovedWorkRoutines.Mono.dll" />
-		<Copy SourceFiles=".\bin\Mono\netstandard2.1\ImprovedWorkRoutines.dll" DestinationFiles="$(RemoteDeploymentPath)\Mods\ImprovedWorkRoutines.Mono.dll" Condition="'$(SendToRemote)' == 'true'" />
 	</Target>
 
 </Project>

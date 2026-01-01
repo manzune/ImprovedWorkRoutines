@@ -71,7 +71,7 @@ namespace ImprovedWorkRoutines
             (
                 identifier: "InsertIngredientTime",
                 default_value: 1f,
-                display_name: "Insert Ingredient Base Time",
+                display_name: "Insert Ingredient Time (Seconds)",
                 description: "Time a chemist needs per ingredient to insert it.",
                 is_hidden: false
             );
