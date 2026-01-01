@@ -6,6 +6,7 @@ A MelonLoader mod for Schedule1 that tries to improve the work routines of emplo
 
 ## Features
 
+### Chemist
 * Change the time your chemist needs to insert items into mixers
 
 <sub>Any ideas? Let me know!</sub>
