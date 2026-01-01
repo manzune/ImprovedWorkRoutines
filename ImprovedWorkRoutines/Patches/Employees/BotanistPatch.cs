@@ -1,6 +1,11 @@
 ﻿using HarmonyLib;
-using Il2CppScheduleOne.Employees;
 using ImprovedWorkRoutines.Employees;
+
+#if IL2CPP
+using Il2CppScheduleOne.Employees;
+#elif MONO
+using ScheduleOne.Employees;
+#endif
 
 namespace ImprovedWorkRoutines.Patches.Employees
 {

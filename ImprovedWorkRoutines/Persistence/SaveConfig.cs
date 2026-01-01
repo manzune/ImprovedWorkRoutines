@@ -1,10 +1,16 @@
-﻿using Il2CppScheduleOne.DevUtilities;
-using Il2CppScheduleOne.Persistence;
-using ImprovedWorkRoutines.Persistence.Datas;
+﻿using ImprovedWorkRoutines.Persistence.Datas;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.Events;
+
+#if IL2CPP
+using Il2CppScheduleOne.DevUtilities;
+using Il2CppScheduleOne.Persistence;
+#elif MONO
+using ScheduleOne.DevUtilities;
+using ScheduleOne.Persistence;
+#endif
 
 namespace ImprovedWorkRoutines.Persistence
 {

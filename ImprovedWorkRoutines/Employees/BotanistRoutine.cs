@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using ImprovedWorkRoutines.Utils;
 using ImprovedWorkRoutines.Persistence;
 using ImprovedWorkRoutines.Persistence.Datas;
-using System.Linq;
-
 
 #if IL2CPP
 using Il2CppScheduleOne.Employees;
@@ -17,6 +16,7 @@ using Il2CppScheduleOne.StationFramework;
 #elif MONO
 using ScheduleOne.Employees;
 using ScheduleOne.Growing;
+using ScheduleOne.ItemFramework;
 using ScheduleOne.Management;
 using ScheduleOne.NPCs.Behaviour;
 using ScheduleOne.ObjectScripts;
@@ -109,8 +109,7 @@ namespace ImprovedWorkRoutines.Employees
                     _botanist.SetIdle(idle: true);
                 }
 #elif MONO
-            List<Behaviour> workBehaviours = (List<Behaviour>)typeof(Employee).GetField("_workBehaviours", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(_botanist);
-            if (workBehaviours.Any(b => b.Active))
+            if (Reflection.GetFieldValue<List<Behaviour>>(typeof(Botanist), "_workBehaviours", _botanist).Any(b => b.Active))
             {
                 Reflection.InvokeMethod(typeof(Employee), "MarkIsWorking", _botanist);
             }
@@ -133,8 +132,6 @@ namespace ImprovedWorkRoutines.Employees
 #endif
                 else
                 {
-                    Logger.Debug("BotanistRoutine", $"Routine patched for: {_botanist.fullName}");
-
                     bool assigned = false;
                     int checkedTasks = 0;
                     while (!assigned && checkedTasks != tasks.Count - 1)
@@ -147,6 +144,10 @@ namespace ImprovedWorkRoutines.Employees
                     {
                         _botanist.SubmitNoWorkReason("There's nothing for me to do right now.", string.Empty);
                         _botanist.SetIdle(idle: true);
+                    }
+                    else
+                    {
+                        Logger.Debug("BotanistRoutine", $"Task for {_botanist.fullName} started: {tasks[checkedTasks - 1].Item2}");
                     }
                 }
             }
@@ -260,6 +261,7 @@ namespace ImprovedWorkRoutines.Employees
                     {
                         flag = true;
                         string fix = "Make sure I have the right seeds in my supplies stash.";
+
                         if (_botanist.configuration.Supplies.SelectedObject == null)
                         {
                             fix = "Use your management clipboards to assign a supplies stash to me, and make sure it contains the right seeds.";
@@ -271,6 +273,7 @@ namespace ImprovedWorkRoutines.Employees
                 else if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
                 {
                     _botanist._sowSeedInPotBehaviour.AssignAndEnable(item);
+
                     return true;
                 }
             }
@@ -284,6 +287,7 @@ namespace ImprovedWorkRoutines.Employees
                     {
                         flag = true;
                         string fix = "Make sure I have the right seeds in my supplies stash.";
+
                         if (Reflection.GetFieldValue<BotanistConfiguration>(typeof(Botanist), "configuration", _botanist).Supplies.SelectedObject == null)
                         {
                             fix = "Use your management clipboards to assign a supplies stash to me, and make sure it contains the right seeds.";
@@ -295,6 +299,7 @@ namespace ImprovedWorkRoutines.Employees
                 else if (Reflection.InvokeMethod<bool>(typeof(Botanist), "IsEntityAccessible", _botanist, [item]))
                 {
                     Reflection.GetFieldValue<SowSeedInPotBehaviour>(typeof(Botanist), "_sowSeedInPotBehaviour", _botanist).AssignAndEnable(item);
+
                     return true;
                 }
             }
@@ -315,6 +320,7 @@ namespace ImprovedWorkRoutines.Employees
                     {
                         flag = true;
                         string fix3 = "Make sure I have shroom spawn my supplies stash.";
+
                         if (_botanist.configuration.Supplies.SelectedObject == null)
                         {
                             fix3 = "Use your management clipboards to assign a supplies stash to me, and make sure it contains shroom spawn.";
@@ -326,6 +332,7 @@ namespace ImprovedWorkRoutines.Employees
                 else if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
                 {
                     _botanist._applySpawnToMushroomBedBehaviour.AssignAndEnable(item);
+
                     return true;
                 }
             }
@@ -339,6 +346,7 @@ namespace ImprovedWorkRoutines.Employees
                     {
                         flag = true;
                         string fix = "Make sure I have shroom spawn my supplies stash.";
+
                         if (Reflection.GetFieldValue<BotanistConfiguration>(typeof(Botanist), "configuration", _botanist).Supplies.SelectedObject == null)
                         {
                             fix = "Use your management clipboards to assign a supplies stash to me, and make sure it contains shroom spawn.";
@@ -461,6 +469,7 @@ namespace ImprovedWorkRoutines.Employees
 
         private bool MoveDryingRackOutput()
         {
+#if IL2CPP
             foreach (DryingRack item in _botanist.GetRacksReadyToMove())
             {
                 if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
@@ -470,66 +479,142 @@ namespace ImprovedWorkRoutines.Employees
                     return true;
                 }
             }
+#elif MONO
+            foreach (DryingRack item in Reflection.InvokeMethod<List<DryingRack>>(typeof(Botanist), "GetRacksReadyToMove", _botanist))
+            {
+                if (Reflection.InvokeMethod<bool>(typeof(Botanist), "IsEntityAccessible", _botanist, [item]))
+                {
+                    _botanist.MoveItemBehaviour.Initialize((item.Configuration as DryingRackConfiguration).DestinationRoute, item.OutputSlot.ItemInstance);
+                    _botanist.MoveItemBehaviour.Enable_Networked();
+
+                    return true;
+                }
+            }
+#endif
 
             return false;
         }
 
         private bool UseSpawnStation()
         {
+#if IL2CPP
             foreach (MushroomSpawnStation item in _botanist.GetSpawnStationsReadyToUse())
             {
                 if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
                 {
                     _botanist._useSpawnStationBehaviour.AssignStation(item);
                     _botanist._useSpawnStationBehaviour.Enable_Networked();
+
                     return true;
                 }
             }
+#elif MONO
+            foreach (MushroomSpawnStation item in Reflection.InvokeMethod<List<MushroomSpawnStation>>(typeof(Botanist), "GetSpawnStationsReadyToUse", _botanist))
+            {
+                if (Reflection.InvokeMethod<bool>(typeof(Botanist), "IsEntityAccessible", _botanist, [item]))
+                {
+                    Reflection.GetFieldValue<UseSpawnStationBehaviour>(typeof(Botanist), "_useSpawnStationBehaviour", _botanist).AssignStation(item);
+                    Reflection.GetFieldValue<UseSpawnStationBehaviour>(typeof(Botanist), "_useSpawnStationBehaviour", _botanist).Enable_Networked();
+
+                    return true;
+                }
+            }
+#endif
 
             return false;
         }
 
         private bool MoveSpawnStationOutput()
         {
+#if IL2CPP
             foreach (MushroomSpawnStation item in _botanist.GetSpawnStationsReadyToMove())
             {
                 if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
                 {
                     _botanist.MoveItemBehaviour.Initialize((item.Configuration as SpawnStationConfiguration).DestinationRoute, item.OutputSlot.ItemInstance);
                     _botanist.MoveItemBehaviour.Enable_Networked();
+
                     return true;
                 }
             }
+#elif MONO
+            foreach (MushroomSpawnStation item in Reflection.InvokeMethod<List<MushroomSpawnStation>>(typeof(Botanist), "GetSpawnStationsReadyToMove", _botanist))
+            {
+                if (Reflection.InvokeMethod<bool>(typeof(Botanist), "IsEntityAccessible", _botanist, [item]))
+                {
+                    _botanist.MoveItemBehaviour.Initialize((item.Configuration as SpawnStationConfiguration).DestinationRoute, item.OutputSlot.ItemInstance);
+                    _botanist.MoveItemBehaviour.Enable_Networked();
+
+                    return true;
+                }
+            }
+#endif
 
             return false;
         }
 
         private bool MoveDryableToRack()
         {
+#if IL2CPP
             if (_botanist.CanMoveDryableToRack(out var dryable, out var destinationRack, out var moveQuantity))
             {
                 TransitRoute route = new TransitRoute(_botanist.configuration.Supplies.SelectedObject.Cast<ITransitEntity>(), destinationRack.Cast<ITransitEntity>());
+
                 if (_botanist.MoveItemBehaviour.IsTransitRouteValid(route, dryable.ID))
                 {
                     _botanist.MoveItemBehaviour.Initialize(route, dryable, moveQuantity);
                     _botanist.MoveItemBehaviour.Enable_Networked();
+
                     return true;
                 }
             }
+#elif MONO
+            object[] parameters = [null, null, null];
+            bool canMove = Reflection.InvokeMethod<bool>(typeof(Botanist), "CanMoveDryableToRack", _botanist, parameters);
+            QualityItemInstance dryable = (QualityItemInstance)parameters[0];
+            DryingRack destinationRack = (DryingRack)parameters[1];
+            int moveQuantity = (int)parameters[2];
+
+            if (canMove)
+            {
+                TransitRoute route = new(Reflection.GetFieldValue<BotanistConfiguration>(typeof(Botanist), "configuration", _botanist).Supplies.SelectedObject as ITransitEntity, destinationRack);
+
+                if (_botanist.MoveItemBehaviour.IsTransitRouteValid(route, dryable.ID))
+                {
+                    _botanist.MoveItemBehaviour.Initialize(route, dryable, moveQuantity);
+                    _botanist.MoveItemBehaviour.Enable_Networked();
+
+                    return true;
+                }
+            }
+#endif
 
             return false;
         }
 
         private bool StartDryingRack()
         {
+#if IL2CPP
             foreach (DryingRack item in _botanist.GetRacksToStart())
             {
                 if (_botanist.IsEntityAccessible(item.Cast<ITransitEntity>()))
                 {
                     _botanist.StartDryingRack(item);
+
                     return true;
                 }
             }
+#elif MONO
+            foreach (DryingRack item in Reflection.InvokeMethod<List<DryingRack>>(typeof(Botanist), "GetRacksToStart", _botanist))
+            {
+                if (Reflection.InvokeMethod<bool>(typeof(Botanist), "IsEntityAccessible", _botanist, [item]))
+                {
+                    Reflection.InvokeMethod(typeof(Botanist), "StartDryingRack", _botanist, [item]);
+
+                    return true;
+                }
+            }
+#endif
 
             return false;
         }

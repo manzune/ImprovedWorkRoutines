@@ -20,12 +20,15 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
         [HarmonyPatch("RpcLogic___StartCook_2166136261")]
         public static bool RpcLogic___StartCook_2166136261Prefix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
+            if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.RpcLogic___StartCook_2166136261();
+                if (modified != null)
+                {
+                    modified.RpcLogic___StartCook_2166136261();
 
-                return false;
+                    return false;
+                }
             }
 
             return true;
@@ -35,7 +38,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
         [HarmonyPatch("Awake")]
         public static void AwakePostfix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
+            if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour.RetrieveOrCreate(__instance);
             }
@@ -45,10 +48,10 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
         [HarmonyPatch("AssignStation")]
         public static void AssignStationPostfix(S1StartMixingStationBehaviour __instance, MixingStation station)
         {
-            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
+            if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.AssignStation(station);
+                modified?.AssignStation(station);
             }
         }
 
@@ -56,10 +59,10 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
         [HarmonyPatch("StopCook")]
         public static void StopCookPostfix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
+            if (ModConfig.Chemist.MixingStation)
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-                modified.StopCook();
+                modified?.StopCook();
             }
         }
     }
