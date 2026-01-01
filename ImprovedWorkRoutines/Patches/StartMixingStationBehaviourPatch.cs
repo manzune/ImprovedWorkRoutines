@@ -18,33 +18,47 @@ namespace ImprovedWorkRoutines.Patches
         [HarmonyPatch("RpcLogic___StartCook_2166136261")]
         public static bool RpcLogic___StartCook_2166136261Prefix(S1StartMixingStationBehaviour __instance)
         {
-            StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-            modified.RpcLogic___StartCook_2166136261();
+            if (ModConfig.Chemist.MixingStation)
+            {
+                StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
+                modified.RpcLogic___StartCook_2166136261();
 
-            return false;
+                return false;
+            }
+
+            return true;
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("Awake")]
         public static void AwakePostfix(S1StartMixingStationBehaviour __instance)
         {
-            StartMixingStationBehaviour.RetrieveOrCreate(__instance);
+            if (ModConfig.Chemist.MixingStation)
+            {
+                StartMixingStationBehaviour.RetrieveOrCreate(__instance);
+            }
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("AssignStation")]
         public static void AssignStationPostfix(S1StartMixingStationBehaviour __instance, MixingStation station)
         {
-            StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-            modified.AssignStation(station);
+            if (ModConfig.Chemist.MixingStation)
+            {
+                StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
+                modified.AssignStation(station);
+            }
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("StopCook")]
         public static void StopCookPostfix(S1StartMixingStationBehaviour __instance)
         {
-            StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-            modified.StopCook();
+            if (ModConfig.Chemist.MixingStation)
+            {
+                StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
+                modified.StopCook();
+            }
         }
     }
 }

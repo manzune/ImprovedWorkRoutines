@@ -25,6 +25,11 @@ namespace ImprovedWorkRoutines
                 get => chemistCategory.GetEntry<float>("InsertIngredientTime").Value;
                 set => chemistCategory.GetEntry<float>("InsertIngredientTime").Value = value;
             }
+            public static bool MixingStation
+            {
+                get => chemistCategory.GetEntry<bool>("MixingStation").Value;
+                set => chemistCategory.GetEntry<bool>("MixingStation").Value = value;
+            }
         }
 
         public static void Initialize()
@@ -73,6 +78,14 @@ namespace ImprovedWorkRoutines
                 default_value: 1f,
                 display_name: "Insert Ingredient Time (Seconds)",
                 description: "Time a chemist needs per ingredient to insert it.",
+                is_hidden: false
+            );
+            chemistCategory.CreateEntry<bool>
+            (
+                identifier: "MixingStation",
+                default_value: true,
+                display_name: "Override Mixing Station Routine",
+                description: "Overrides the mixing station routine",
                 is_hidden: false
             );
         }

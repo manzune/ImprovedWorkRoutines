@@ -4,7 +4,6 @@ using MelonLoader;
 using System.Collections;
 using static UnityEngine.UI.Image;
 
-
 #if IL2CPP
 using Il2CppScheduleOne.Employees;
 using Il2CppScheduleOne.ObjectScripts;
