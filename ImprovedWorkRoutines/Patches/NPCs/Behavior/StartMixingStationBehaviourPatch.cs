@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using ImprovedWorkRoutines.NPCs.Behavior;
 
-
 #if IL2CPP
 using Il2CppScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = Il2CppScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
