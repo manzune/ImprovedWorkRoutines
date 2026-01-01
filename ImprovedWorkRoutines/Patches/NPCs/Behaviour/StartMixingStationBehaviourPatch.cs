@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
-using ImprovedWorkRoutines.NPCs.Behavior;
+using ImprovedWorkRoutines.NPCs.Behaviour;
+using ScheduleOne.Employees;
+
 
 #if IL2CPP
 using Il2CppScheduleOne.ObjectScripts;
@@ -9,7 +11,7 @@ using ScheduleOne.ObjectScripts;
 using S1StartMixingStationBehaviour = ScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #endif
 
-namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
+namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
 {
     [HarmonyPatch(typeof(S1StartMixingStationBehaviour))]
     public class StartMixingStationBehaviourPatch
@@ -18,7 +20,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
         [HarmonyPatch("RpcLogic___StartCook_2166136261")]
         public static bool RpcLogic___StartCook_2166136261Prefix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation)
+            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
                 modified.RpcLogic___StartCook_2166136261();
@@ -33,7 +35,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
         [HarmonyPatch("Awake")]
         public static void AwakePostfix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation)
+            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
             {
                 StartMixingStationBehaviour.RetrieveOrCreate(__instance);
             }
@@ -43,7 +45,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
         [HarmonyPatch("AssignStation")]
         public static void AssignStationPostfix(S1StartMixingStationBehaviour __instance, MixingStation station)
         {
-            if (ModConfig.Chemist.MixingStation)
+            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
                 modified.AssignStation(station);
@@ -54,7 +56,7 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behavior
         [HarmonyPatch("StopCook")]
         public static void StopCookPostfix(S1StartMixingStationBehaviour __instance)
         {
-            if (ModConfig.Chemist.MixingStation)
+            if (ModConfig.Chemist.MixingStation && __instance.Npc.GetType() == typeof(Chemist))
             {
                 StartMixingStationBehaviour modified = StartMixingStationBehaviour.RetrieveOrCreate(__instance);
                 modified.StopCook();

@@ -20,11 +20,11 @@ using FishNet;
 using S1StartMixingStationBehaviour = ScheduleOne.NPCs.Behaviour.StartMixingStationBehaviour;
 #endif
 
-namespace ImprovedWorkRoutines.NPCs.Behavior
+namespace ImprovedWorkRoutines.NPCs.Behaviour
 {
     public class StartMixingStationBehaviour
     {
-        private static readonly List<StartMixingStationBehaviour> actives = [];
+        private static readonly List<StartMixingStationBehaviour> cache = [];
 
         private readonly Chemist _chemist;
 
@@ -46,17 +46,17 @@ namespace ImprovedWorkRoutines.NPCs.Behavior
 
         public static StartMixingStationBehaviour RetrieveOrCreate(S1StartMixingStationBehaviour original)
         {
-            StartMixingStationBehaviour behavior = actives.Find(x => x._original == original);
+            StartMixingStationBehaviour behaviour = cache.Find(x => x._original == original);
 
-            if (behavior == null)
+            if (behaviour == null)
             {
-                behavior = new(original);
-                actives.Add(behavior);
+                behaviour = new(original);
+                cache.Add(behaviour);
 
                 Utils.Logger.Debug("StartMixingStationBehaviour", $"Created for: {original.Npc.fullName}");
             }
 
-            return behavior;
+            return behaviour;
         }
 
         public void AssignStation(MixingStation station)
@@ -74,7 +74,7 @@ namespace ImprovedWorkRoutines.NPCs.Behavior
 
             IEnumerator CookRoutine()
             {
-                Utils.Logger.Debug("StartMixingStationBehaviour", $"Routine patched for: {_chemist.fullName}");
+                Utils.Logger.Debug("StartMixingStationBehaviour", $"Behaviour patched for: {_chemist.fullName}");
 
                 _chemist.Movement.FacePoint(_targetStation.transform.position);
                 yield return new WaitForSeconds(0.5f);

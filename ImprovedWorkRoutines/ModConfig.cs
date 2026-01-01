@@ -8,6 +8,8 @@ namespace ImprovedWorkRoutines
     {
         private static MelonPreferences_Category generalCategory;
 
+        private static MelonPreferences_Category botanistCategory;
+
         private static MelonPreferences_Category chemistCategory;
 
         private static bool isInitialized;
@@ -18,6 +20,15 @@ namespace ImprovedWorkRoutines
             set => generalCategory.GetEntry<bool>("Debug").Value = value;
         }
 
+        public struct Botanist
+        {
+            public static bool ReorderTasks
+            {
+                get => botanistCategory.GetEntry<bool>("ReorderTasks").Value;
+                set => botanistCategory.GetEntry<bool>("ReorderTasks").Value = value;
+            }
+        }
+
         public struct Chemist
         {
             public static float InsertIngredientTime
@@ -25,6 +36,7 @@ namespace ImprovedWorkRoutines
                 get => chemistCategory.GetEntry<float>("InsertIngredientTime").Value;
                 set => chemistCategory.GetEntry<float>("InsertIngredientTime").Value = value;
             }
+
             public static bool MixingStation
             {
                 get => chemistCategory.GetEntry<bool>("MixingStation").Value;
@@ -37,10 +49,13 @@ namespace ImprovedWorkRoutines
             if (isInitialized) return;
 
             generalCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_01_General", $"{ModInfo.Name} - General Settings", false, true);
-            chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_02_Chemist", $"{ModInfo.Name} - Chemist Settings", false, true);
+            botanistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_02_Botanist", $"{ModInfo.Name} - Botanist Settings", false, true);
+            chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_03_Chemist", $"{ModInfo.Name} - Chemist Settings", false, true);
+
             string path = Path.Combine(MelonEnvironment.UserDataDirectory, $"{ModInfo.Name}.cfg");
 
             generalCategory.SetFilePath(path, true, false);
+            botanistCategory.SetFilePath(path, true, false);
             chemistCategory.SetFilePath(path, true, false);
 
             CreateEntries();
@@ -52,7 +67,18 @@ namespace ImprovedWorkRoutines
                     entry.ResetToDefault();
                 }
 
+                foreach (var entry in botanistCategory.Entries)
+                {
+                    entry.ResetToDefault();
+                }
+
+                foreach (var entry in chemistCategory.Entries)
+                {
+                    entry.ResetToDefault();
+                }
+
                 generalCategory.SaveToFile(false);
+                botanistCategory.SaveToFile(false);
                 chemistCategory.SaveToFile(false);
             }
 
@@ -68,6 +94,16 @@ namespace ImprovedWorkRoutines
                 default_value: false,
                 display_name: "Enable Debug Mode",
                 description: "Enables debugging for this mod",
+                is_hidden: false
+            );
+
+            // Botanist
+            botanistCategory.CreateEntry<bool>
+            (
+                identifier: "ReorderTasks",
+                default_value: true,
+                display_name: "Reorder Taks",
+                description: "Enables custom task ordering for botanists",
                 is_hidden: false
             );
 

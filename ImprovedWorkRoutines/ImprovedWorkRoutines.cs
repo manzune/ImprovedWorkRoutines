@@ -1,4 +1,5 @@
 ﻿using ImprovedWorkRoutines;
+using ImprovedWorkRoutines.Persistence;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(ImprovedWorkRoutines.ImprovedWorkRoutines), $"{ModInfo.Name}", ModInfo.Version, ModInfo.Author, ModInfo.DownloadLink)]
@@ -16,21 +17,27 @@ namespace ImprovedWorkRoutines
     {
         public bool IsInitialized { get; private set; }
 
+        public override void OnInitializeMelon()
+        {
+            if (!IsInitialized)
+            {
+                ModConfig.Initialize();
+
+                Utils.Logger.Msg($"{ModInfo.Name} v{ModInfo.Version} initialized");
+
+                IsInitialized = true;
+            }
+        }
+
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             if (sceneName == "Menu")
             {
-                if (!IsInitialized)
-                {
-                    ModConfig.Initialize();
-
-                    Utils.Logger.Msg($"{ModInfo.Name} v{ModInfo.Version} initialized");
-
-                    IsInitialized = true;
-                }
+                SaveConfig.ClearConfig();
             }
             else if (sceneName == "Main")
             {
+                SaveConfig.LoadConfig();
             }
         }
     }

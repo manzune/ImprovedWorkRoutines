@@ -132,11 +132,6 @@
 	<!-- Mono Mod Integration Deps -->
 	<ItemGroup Condition="'$(Configuration)' == 'Mono'">
 	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="Persistence\**" />
-	  <EmbeddedResource Remove="Persistence\**" />
-	  <None Remove="Persistence\**" />
-	</ItemGroup>
 
 	<!-- Automated local deployment -->
 	<Target Name="PostBuildIl2Cpp" AfterTargets="Build" Condition="'$(AutomateLocalDeployment)' == 'true' and '$(Configuration)' == 'Il2Cpp'">
