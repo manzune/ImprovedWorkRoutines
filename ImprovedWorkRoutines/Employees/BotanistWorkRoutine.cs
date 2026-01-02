@@ -25,9 +25,9 @@ using ScheduleOne.StationFramework;
 
 namespace ImprovedWorkRoutines.Employees
 {
-    public class BotanistRoutine
+    public class BotanistWorkRoutine
     {
-        private static readonly List<BotanistRoutine> cache = [];
+        private static readonly List<BotanistWorkRoutine> cache = [];
 
         private static readonly SortedDictionary<int, (string, string, Func<bool>)> tasks = [];
 
@@ -37,7 +37,7 @@ namespace ImprovedWorkRoutines.Employees
 
         private readonly Botanist _botanist;
 
-        private BotanistRoutine(Botanist botanist)
+        private BotanistWorkRoutine(Botanist botanist)
         {
             _botanist = botanist;
             _config = SaveConfig.Data.Botanists.Find(x => x.Identifier == botanist.GUID.ToString());
@@ -45,12 +45,12 @@ namespace ImprovedWorkRoutines.Employees
 
             CreateTasks();
 
-            Utils.Logger.Debug("BotanistRoutine", $"Created for: {_botanist.fullName}");
+            Logger.Debug("BotanistWorkRoutine", $"Routine for {_botanist.fullName} created.");
         }
 
-        public static BotanistRoutine RetrieveOrCreate(Botanist botanist)
+        public static BotanistWorkRoutine RetrieveOrCreate(Botanist botanist)
         {
-            BotanistRoutine routine = cache.Find(x => x._botanist == botanist);
+            BotanistWorkRoutine routine = cache.Find(x => x._botanist == botanist);
 
             if (routine == null)
             {
@@ -59,6 +59,24 @@ namespace ImprovedWorkRoutines.Employees
             }
 
             return routine;
+        }
+
+        public static void ClearCache()
+        {
+            for (int i = cache.Count - 1; i >=0; i--)
+            {
+                cache[i].Destroy();
+            }
+
+            Logger.Debug("BotanistWorkRoutine", $"Cache cleared");
+        }
+
+        public void Destroy()
+        {
+            SaveConfig.Data.Botanists.Remove(_config);
+            cache.Remove(this);
+
+            Logger.Debug("BotanistWorkRoutine", $"Routine for {_botanist.fullName} destroyed.");
         }
 
         private void CreateTasks()
@@ -79,7 +97,9 @@ namespace ImprovedWorkRoutines.Employees
                 tasks.Add(_config.Priorities.MoveSpawnStationOutput, ("MoveSpawnStationOutput", "Move spawn station output", new(MoveSpawnStationOutput)));
                 tasks.Add(_config.Priorities.MoveDryableToRack, ("MoveDryableToRack", "Move dryable to rack", new(MoveDryableToRack)));
                 tasks.Add(_config.Priorities.StartDryingRack, ("StartDryingRack", "Start drying rack", new(StartDryingRack)));
-                
+
+                Logger.Debug("BotanistWorkRoutine", $"{tasks.Count} tasks for {_botanist.fullName} created.");
+
                 _tasksCreated = true;
             }
         }
@@ -94,6 +114,7 @@ namespace ImprovedWorkRoutines.Employees
             }
             else if (_botanist.Fired)
             {
+                Destroy();
                 _botanist.LeavePropertyAndDespawn();
             }
             else
@@ -147,7 +168,7 @@ namespace ImprovedWorkRoutines.Employees
                     }
                     else
                     {
-                        Logger.Debug("BotanistRoutine", $"Task for {_botanist.fullName} started: {tasks[checkedTasks - 1].Item2}");
+                        Logger.Debug("BotanistWorkRoutine", $"Task for {_botanist.fullName} started: {tasks[checkedTasks - 1].Item2}");
                     }
                 }
             }
@@ -181,7 +202,7 @@ namespace ImprovedWorkRoutines.Employees
         private bool MistMushroomBed()
         {
 
-#if Il2CPP
+#if IL2CPP
             MushroomBed mushroomBedForMisting = _botanist.GetMushroomBedForMisting(0.2f);
 
             if (mushroomBedForMisting != null)

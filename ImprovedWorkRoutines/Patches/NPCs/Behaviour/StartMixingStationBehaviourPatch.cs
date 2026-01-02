@@ -35,16 +35,6 @@ namespace ImprovedWorkRoutines.Patches.NPCs.Behaviour
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch("Awake")]
-        public static void AwakePostfix(S1StartMixingStationBehaviour __instance)
-        {
-            if (ModConfig.Chemist.MixingStation)
-            {
-                StartMixingStationBehaviour.RetrieveOrCreate(__instance);
-            }
-        }
-
-        [HarmonyPostfix]
         [HarmonyPatch("AssignStation")]
         public static void AssignStationPostfix(S1StartMixingStationBehaviour __instance, MixingStation station)
         {

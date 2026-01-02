@@ -18,23 +18,13 @@ namespace ImprovedWorkRoutines.Patches.Employees
         {
             if (ModConfig.Botanist.ReorderTasks)
             {
-                BotanistRoutine routine = BotanistRoutine.RetrieveOrCreate(__instance);
+                BotanistWorkRoutine routine = BotanistWorkRoutine.RetrieveOrCreate(__instance);
                 routine.UpdateBehaviour();
 
                 return false;
             }
 
             return true;
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch("Awake")]
-        public static void AwakePostfix(Botanist __instance)
-        {
-            if (ModConfig.Botanist.ReorderTasks)
-            {
-                BotanistRoutine.RetrieveOrCreate(__instance);
-            }
         }
     }
 }
