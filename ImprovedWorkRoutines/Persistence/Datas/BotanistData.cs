@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ImprovedWorkRoutines.Persistence.Datas
+﻿namespace ImprovedWorkRoutines.Persistence.Datas
 {
     public class BotanistData : DataBase
     {

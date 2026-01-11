@@ -31,6 +31,12 @@ namespace ImprovedWorkRoutines
 
         public struct Chemist
         {
+            public static bool ReorderTasks
+            {
+                get => botanistCategory.GetEntry<bool>("ReorderTasks").Value;
+                set => botanistCategory.GetEntry<bool>("ReorderTasks").Value = value;
+            }
+
             public static float InsertIngredientTime
             {
                 get => chemistCategory.GetEntry<float>("InsertIngredientTime").Value;
@@ -102,12 +108,20 @@ namespace ImprovedWorkRoutines
             (
                 identifier: "ReorderTasks",
                 default_value: true,
-                display_name: "Reorder Taks",
+                display_name: "Reorder Tasks",
                 description: "Enables custom task ordering for botanists",
                 is_hidden: false
             );
 
             // Chemist
+            chemistCategory.CreateEntry<bool>
+            (
+                identifier: "ReorderTasks",
+                default_value: true,
+                display_name: "Reorder Tasks",
+                description: "Enables custom task ordering for chemists",
+                is_hidden: false
+            );
             chemistCategory.CreateEntry<float>
             (
                 identifier: "InsertIngredientTime",

@@ -65,6 +65,8 @@ namespace ImprovedWorkRoutines.Persistence
         public struct DataWrapper
         {
             public List<BotanistData> Botanists;
+
+            public List<ChemistData> Chemists;
         }
     }
 }

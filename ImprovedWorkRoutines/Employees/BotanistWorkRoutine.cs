@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 using ImprovedWorkRoutines.Utils;
 using ImprovedWorkRoutines.Persistence;
 using ImprovedWorkRoutines.Persistence.Datas;
@@ -25,27 +24,22 @@ using ScheduleOne.StationFramework;
 
 namespace ImprovedWorkRoutines.Employees
 {
-    public class BotanistWorkRoutine
+    public class BotanistWorkRoutine : WorkRoutine
     {
         private static readonly List<BotanistWorkRoutine> cache = [];
 
-        private static readonly SortedDictionary<int, (string, string, Func<bool>)> tasks = [];
-
-        private bool _tasksCreated;
-
         private readonly BotanistData _config;
 
-        private readonly Botanist _botanist;
+#if IL2CPP
+        private Botanist _botanist => Employee.Cast<Botanist>();
+#elif MONO
+        private Botanist _botanist => Employee as Botanist;
+#endif
 
-        private BotanistWorkRoutine(Botanist botanist)
+        private BotanistWorkRoutine(Botanist botanist) : base(botanist)
         {
-            _botanist = botanist;
             _config = SaveConfig.Data.Botanists.Find(x => x.Identifier == botanist.GUID.ToString());
             _config ??= new(botanist.GUID.ToString(), true);
-
-            CreateTasks();
-
-            Logger.Debug("BotanistWorkRoutine", $"Routine for {_botanist.fullName} created.");
         }
 
         public static BotanistWorkRoutine RetrieveOrCreate(Botanist botanist)
@@ -79,34 +73,35 @@ namespace ImprovedWorkRoutines.Employees
             Logger.Debug("BotanistWorkRoutine", $"Routine for {_botanist.fullName} destroyed.");
         }
 
-        private void CreateTasks()
+        protected override void RegisterTasks()
         {
-            if (!_tasksCreated && _config != null)
+            if (!TasksCreated && _config != null)
             {
-                tasks.Add(_config.Priorities.WaterPot, ("WaterPot", "Water pot", new(WaterPot)));
-                tasks.Add(_config.Priorities.MistMushroomBed, ("MistMushroomBed", "Mist mushroom bed", new(MistMushroomBed)));
-                tasks.Add(_config.Priorities.AddSoilToGrowContainer, ("AddSoilToGrowContainer", "Add soil to grow container", new(AddSoilToGrowContainer)));
-                tasks.Add(_config.Priorities.SowSeedInPot, ("SowSeedInPod", "Sow seed in pot", new(SowSeedInPot)));
-                tasks.Add(_config.Priorities.ApplySpawnToMushroomBed, ("ApplySpawnToMushroomBed", "Apply spawn to mushroom bed", new(ApplySpawnToMushroomBed)));
-                tasks.Add(_config.Priorities.ApplyAdditiveToGrowContainer, ("ApplyAdditiveToGrowContainer", "Apply additive to grow container", new(ApplyAdditiveToGrowContainer)));
-                tasks.Add(_config.Priorities.HarvestPot, ("HarvestPot", "Harvest pot", new(HarvestPot)));
-                tasks.Add(_config.Priorities.HarvestMushroomBed, ("HarvestMushroomBed", "Harvest mushroom bed", new(HarvestMushroomBed)));
-                tasks.Add(_config.Priorities.StopDryingRack, ("StopDryingRack", "Stop drying rack", new(StopDryingRack)));
-                tasks.Add(_config.Priorities.MoveDryingRackOutput, ("MoveDryingRackOutput", "Move drying rack output", new(MoveDryingRackOutput)));
-                tasks.Add(_config.Priorities.UseSpawnStation, ("UseSpawnStation", "Use spawn station", new(UseSpawnStation)));
-                tasks.Add(_config.Priorities.MoveSpawnStationOutput, ("MoveSpawnStationOutput", "Move spawn station output", new(MoveSpawnStationOutput)));
-                tasks.Add(_config.Priorities.MoveDryableToRack, ("MoveDryableToRack", "Move dryable to rack", new(MoveDryableToRack)));
-                tasks.Add(_config.Priorities.StartDryingRack, ("StartDryingRack", "Start drying rack", new(StartDryingRack)));
+                RegisterTask("WaterPot", "Water pot", _config.Priorities.WaterPot, WaterPot);
+                RegisterTask("MistMushroomBed", "Mist mushroom bed", _config.Priorities.MistMushroomBed, MistMushroomBed);
+                RegisterTask("AddSoilToGrowContainer", "Add soil to grow container", _config.Priorities.AddSoilToGrowContainer, AddSoilToGrowContainer);
+                RegisterTask("SowSeedInPot", "Sow seed in pot", _config.Priorities.SowSeedInPot, SowSeedInPot);
+                RegisterTask("ApplySpawnToMushroomBed", "Apply spawn to mushroom bed", _config.Priorities.ApplySpawnToMushroomBed, ApplySpawnToMushroomBed);
+                RegisterTask("ApplyAdditiveToGrowContainer", "Apply additive to grow container", _config.Priorities.ApplyAdditiveToGrowContainer, ApplyAdditiveToGrowContainer);
+                RegisterTask("HarvestPot", "Harvest pot", _config.Priorities.HarvestPot, HarvestPot);
+                RegisterTask("HarvestMushroomBed", "Harvest mushroom bed", _config.Priorities.HarvestMushroomBed, HarvestMushroomBed);
+                RegisterTask("StopDryingRack", "Stop drying rack", _config.Priorities.StopDryingRack, StopDryingRack);
+                RegisterTask("MoveDryingRackOutput", "Move drying rack output", _config.Priorities.MoveDryingRackOutput, MoveDryingRackOutput);
+                RegisterTask("UseSpawnStation", "Use spawn station", _config.Priorities.UseSpawnStation, UseSpawnStation);
+                RegisterTask("MoveSpawnStationOutput", "Move spawn station output", _config.Priorities.MoveSpawnStationOutput, MoveSpawnStationOutput);
+                RegisterTask("MoveDryableToRack", "Move dryable to rack", _config.Priorities.MoveDryableToRack, MoveDryableToRack);
+                RegisterTask("StartDryingRack", "Start drying rack", _config.Priorities.StartDryingRack, StartDryingRack);
 
-                Logger.Debug("BotanistWorkRoutine", $"{tasks.Count} tasks for {_botanist.fullName} created.");
+                Logger.Debug("BotanistWorkRoutine", $"{Tasks.Count} tasks for {_botanist.fullName} created.");
 
-                _tasksCreated = true;
+                base.RegisterTasks();
             }
         }
-
-        public void UpdateBehaviour()
+        
+        public override void UpdateBehaviour()
         {
-            EmployeeHelper.CheckWorkConditions(_botanist);
+            CheckWorkConditions();
+
 #if IL2CPP
             if (_botanist._workBehaviours.Find(new Func<Behaviour, bool>(b => b.Active)) != null)
             {
@@ -127,7 +122,7 @@ namespace ImprovedWorkRoutines.Employees
                 if (_botanist.configuration.Assigns.SelectedObjects.Count == 0)
                 {
                     _botanist.SubmitNoWorkReason("I haven't been assigned anything", "You can use your management clipboards to assign me pots, growing racks, etc.");
-                    _botanist.SetIdle(idle: true);
+                    _botanist.SetIdle(true);
                 }
 #elif MONO
             if (Reflection.GetFieldValue<List<Behaviour>>(typeof(Botanist), "_workBehaviours", _botanist).Any(b => b.Active))
@@ -148,28 +143,12 @@ namespace ImprovedWorkRoutines.Employees
                 if (Reflection.GetPropertyValue<BotanistConfiguration>(typeof(Botanist), "configuration", _botanist).Assigns.SelectedObjects.Count == 0)
                 {
                     _botanist.SubmitNoWorkReason("I haven't been assigned anything", "You can use your management clipboards to assign me pots, growing racks, etc.");
-                    _botanist.SetIdle(idle: true);
+                    _botanist.SetIdle(true);
                 }
 #endif
                 else
                 {
-                    bool assigned = false;
-                    int checkedTasks = 0;
-                    while (!assigned && checkedTasks != tasks.Count - 1)
-                    {
-                        assigned = tasks[checkedTasks].Item3.Invoke();
-                        checkedTasks++;
-                    }
-
-                    if (!assigned)
-                    {
-                        _botanist.SubmitNoWorkReason("There's nothing for me to do right now.", string.Empty);
-                        _botanist.SetIdle(idle: true);
-                    }
-                    else
-                    {
-                        Logger.Debug("BotanistWorkRoutine", $"Task for {_botanist.fullName} started: {tasks[checkedTasks - 1].Item2}");
-                    }
+                    base.UpdateBehaviour();
                 }
             }
         }
@@ -194,7 +173,7 @@ namespace ImprovedWorkRoutines.Employees
 
                 return true;
             }
-# endif
+#endif
 
             return false;
         }
@@ -579,7 +558,7 @@ namespace ImprovedWorkRoutines.Employees
 #if IL2CPP
             if (_botanist.CanMoveDryableToRack(out var dryable, out var destinationRack, out var moveQuantity))
             {
-                TransitRoute route = new TransitRoute(_botanist.configuration.Supplies.SelectedObject.Cast<ITransitEntity>(), destinationRack.Cast<ITransitEntity>());
+                TransitRoute route = new(_botanist.configuration.Supplies.SelectedObject.Cast<ITransitEntity>(), destinationRack.Cast<ITransitEntity>());
 
                 if (_botanist.MoveItemBehaviour.IsTransitRouteValid(route, dryable.ID))
                 {
