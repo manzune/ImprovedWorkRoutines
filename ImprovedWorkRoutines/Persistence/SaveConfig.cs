@@ -38,7 +38,9 @@ namespace ImprovedWorkRoutines.Persistence
             {
                 Data = new()
                 {
-                    Botanists = []
+                    Botanists = [],
+                    Chemists = [],
+                    Packagers = []
                 };
             }
 
@@ -67,6 +69,8 @@ namespace ImprovedWorkRoutines.Persistence
             public List<BotanistData> Botanists;
 
             public List<ChemistData> Chemists;
+
+            public List<PackagerData> Packagers;
         }
     }
 }

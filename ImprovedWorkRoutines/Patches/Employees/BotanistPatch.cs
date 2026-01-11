@@ -26,5 +26,16 @@ namespace ImprovedWorkRoutines.Patches.Employees
 
             return true;
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("Fire")]
+        public static void FirePostfix(Botanist __instance)
+        {
+            if (BotanistWorkRoutine.Exists(__instance))
+            {
+                BotanistWorkRoutine routine = BotanistWorkRoutine.RetrieveOrCreate(__instance);
+                routine.Destroy();
+            }
+        }
     }
 }

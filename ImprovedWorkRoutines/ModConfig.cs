@@ -12,6 +12,8 @@ namespace ImprovedWorkRoutines
 
         private static MelonPreferences_Category chemistCategory;
 
+        private static MelonPreferences_Category packagerCategory;
+
         private static bool isInitialized;
 
         public static bool Debug
@@ -33,8 +35,8 @@ namespace ImprovedWorkRoutines
         {
             public static bool ReorderTasks
             {
-                get => botanistCategory.GetEntry<bool>("ReorderTasks").Value;
-                set => botanistCategory.GetEntry<bool>("ReorderTasks").Value = value;
+                get => chemistCategory.GetEntry<bool>("ReorderTasks").Value;
+                set => chemistCategory.GetEntry<bool>("ReorderTasks").Value = value;
             }
 
             public static float InsertIngredientTime
@@ -50,6 +52,15 @@ namespace ImprovedWorkRoutines
             }
         }
 
+        public struct Packager
+        {
+            public static bool ReorderTasks
+            {
+                get => packagerCategory.GetEntry<bool>("ReorderTasks").Value;
+                set => packagerCategory.GetEntry<bool>("ReorderTasks").Value = value;
+            }
+        }
+
         public static void Initialize()
         {
             if (isInitialized) return;
@@ -57,12 +68,14 @@ namespace ImprovedWorkRoutines
             generalCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_01_General", $"{ModInfo.Name} - General Settings", false, true);
             botanistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_02_Botanist", $"{ModInfo.Name} - Botanist Settings", false, true);
             chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_03_Chemist", $"{ModInfo.Name} - Chemist Settings", false, true);
+            packagerCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_04_Packager", $"{ModInfo.Name} - Packager Settings", false, true);
 
             string path = Path.Combine(MelonEnvironment.UserDataDirectory, $"{ModInfo.Name}.cfg");
 
             generalCategory.SetFilePath(path, true, false);
             botanistCategory.SetFilePath(path, true, false);
             chemistCategory.SetFilePath(path, true, false);
+            packagerCategory.SetFilePath(path, true, false);
 
             CreateEntries();
 
@@ -83,9 +96,15 @@ namespace ImprovedWorkRoutines
                     entry.ResetToDefault();
                 }
 
+                foreach (var entry in packagerCategory.Entries)
+                {
+                    entry.ResetToDefault();
+                }
+
                 generalCategory.SaveToFile(false);
                 botanistCategory.SaveToFile(false);
                 chemistCategory.SaveToFile(false);
+                packagerCategory.SaveToFile(false);
             }
 
             isInitialized = true;
@@ -136,6 +155,16 @@ namespace ImprovedWorkRoutines
                 default_value: true,
                 display_name: "Override Mixing Station Routine",
                 description: "Overrides the mixing station routine",
+                is_hidden: false
+            );
+
+            // Packager
+            packagerCategory.CreateEntry<bool>
+            (
+                identifier: "ReorderTasks",
+                default_value: true,
+                display_name: "Reorder Tasks",
+                description: "Enables custom task ordering for packagers",
                 is_hidden: false
             );
         }

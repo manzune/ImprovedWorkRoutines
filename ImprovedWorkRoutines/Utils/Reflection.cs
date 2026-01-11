@@ -11,6 +11,14 @@ namespace ImprovedWorkRoutines.Utils
             return (T)type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(instance, parameters);
         }
 
+        public static T InvokeMethodWithOut<T>(Type type, string methodName, object instance, object[] parameters, out object[] outParameters)
+        {
+            T result = (T)type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(instance, parameters);
+            outParameters = parameters;
+
+            return result;
+        }
+
         public static void InvokeMethod(Type type, string methodName, object instance, object[] parameters = null)
         {
             parameters ??= [];

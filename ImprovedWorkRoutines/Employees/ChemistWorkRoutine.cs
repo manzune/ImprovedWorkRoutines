@@ -2,6 +2,8 @@
 using ImprovedWorkRoutines.Persistence.Datas;
 using ImprovedWorkRoutines.Utils;
 using System.Collections.Generic;
+using System.Linq;
+
 
 #if IL2CPP
 using Il2CppFishNet;
@@ -46,6 +48,11 @@ namespace ImprovedWorkRoutines.Employees
             }
 
             return routine;
+        }
+
+        public static bool Exists(Chemist chemist)
+        {
+            return cache.Any(x => x._chemist == chemist);
         }
 
         public static void ClearCache()

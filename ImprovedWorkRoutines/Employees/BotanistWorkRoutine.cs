@@ -55,6 +55,11 @@ namespace ImprovedWorkRoutines.Employees
             return routine;
         }
 
+        public static bool Exists(Botanist botanist)
+        {
+            return cache.Any(x => x._botanist == botanist);
+        }
+
         public static void ClearCache()
         {
             for (int i = cache.Count - 1; i >=0; i--)

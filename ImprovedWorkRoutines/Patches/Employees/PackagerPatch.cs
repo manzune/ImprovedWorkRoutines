@@ -9,16 +9,16 @@ using ScheduleOne.Employees;
 
 namespace ImprovedWorkRoutines.Patches.Employees
 {
-    [HarmonyPatch(typeof(Chemist))]
-    public class ChemistPatch
+    [HarmonyPatch(typeof(Packager))]
+    public class PackagerPatch
     {
         [HarmonyPrefix]
         [HarmonyPatch("UpdateBehaviour")]
-        public static bool UpdateBehaviourPrefix(Chemist __instance)
+        public static bool UpdateBehaviourPrefix(Packager __instance)
         {
-            if (ModConfig.Chemist.ReorderTasks)
+            if (ModConfig.Packager.ReorderTasks)
             {
-                ChemistWorkRoutine routine = ChemistWorkRoutine.RetrieveOrCreate(__instance);
+                PackagerWorkRoutine routine = PackagerWorkRoutine.RetrieveOrCreate(__instance);
                 routine.UpdateBehaviour();
 
                 return false;
@@ -29,11 +29,11 @@ namespace ImprovedWorkRoutines.Patches.Employees
 
         [HarmonyPostfix]
         [HarmonyPatch("Fire")]
-        public static void FirePostfix(Chemist __instance)
+        public static void FirePostfix(Packager __instance)
         {
-            if (ChemistWorkRoutine.Exists(__instance))
+            if (PackagerWorkRoutine.Exists(__instance))
             {
-                ChemistWorkRoutine routine = ChemistWorkRoutine.RetrieveOrCreate(__instance);
+                PackagerWorkRoutine routine = PackagerWorkRoutine.RetrieveOrCreate(__instance);
                 routine.Destroy();
             }
         }
