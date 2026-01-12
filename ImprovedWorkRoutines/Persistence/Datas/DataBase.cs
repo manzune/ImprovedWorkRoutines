@@ -14,7 +14,7 @@ namespace ImprovedWorkRoutines.Persistence.Datas
         public DataBase(string identifier)
         {
             DataType = GetType().Name;
-            ModVersion = ModInfo.Version;
+            ModVersion = ModInfo.VERSION;
             Identifier = identifier;
         }
 

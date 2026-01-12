@@ -4,7 +4,6 @@ using ImprovedWorkRoutines.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
-
 #if IL2CPP
 using Il2CppFishNet;
 using Il2CppScheduleOne.Employees;
@@ -21,30 +20,22 @@ namespace ImprovedWorkRoutines.Employees
 {
     public class ChemistWorkRoutine : WorkRoutine
     {
-        private static readonly List<ChemistWorkRoutine> cache = [];
-
-        private readonly ChemistData _config;
-
 #if IL2CPP
         private Chemist _chemist => Employee.Cast<Chemist>();
 #elif MONO
         private Chemist _chemist => Employee as Chemist;
 #endif
 
-        private ChemistWorkRoutine(Chemist chemist) : base(chemist)
-        {
-            _config = SaveConfig.Data.Chemists.Find(x => x.Identifier == chemist.GUID.ToString());
-            _config ??= new(chemist.GUID.ToString(), true);
-        }
+        private ChemistWorkRoutine(Chemist chemist) : base(chemist) { }
 
         public static ChemistWorkRoutine RetrieveOrCreate(Chemist chemist)
         {
-            ChemistWorkRoutine routine = cache.Find(x => x._chemist == chemist);
+            ChemistWorkRoutine routine = GetCachedRoutine<ChemistWorkRoutine>(chemist);
 
             if (routine == null)
             {
                 routine = new(chemist);
-                cache.Add(routine);
+                Cache.Add(routine);
             }
 
             return routine;
@@ -52,45 +43,21 @@ namespace ImprovedWorkRoutines.Employees
 
         public static bool Exists(Chemist chemist)
         {
-            return cache.Any(x => x._chemist == chemist);
-        }
-
-        public static void ClearCache()
-        {
-            for (int i = cache.Count - 1; i >= 0; i--)
-            {
-                cache[i].Destroy();
-            }
-
-            Logger.Debug("ChemistWorkRoutine", $"Cache cleared");
-        }
-
-        public void Destroy()
-        {
-            SaveConfig.Data.Chemists.Remove(_config);
-            cache.Remove(this);
-
-            Logger.Debug("ChemistWorkRoutine", $"Routine for {_chemist.fullName} destroyed.");
+            return GetCachedRoutine<ChemistWorkRoutine>(chemist) != null;
         }
 
         protected override void RegisterTasks()
         {
-            if (!TasksCreated && _config != null)
-            {
-                RegisterTask("FinishLabOven", "Finish lab oven", _config.Priorities.FinishLabOven, FinishLabOven);
-                RegisterTask("StartLabOven", "Start lab oven", _config.Priorities.StartLabOven, StartLabOven);
-                RegisterTask("StartChemistryStation", "Start chemistry station", _config.Priorities.StartChemistryStation, StartChemistryStation);
-                RegisterTask("StartCauldron", "Start couldron", _config.Priorities.StartCauldron, StartCauldron);
-                RegisterTask("StartMixingStation", "Start mixing station", _config.Priorities.StartMixingStation, StartMixingStation);
-                RegisterTask("MoveLabOvenOutput", "Move lab oven output", _config.Priorities.MoveLabOvenOutput, MoveLabOvenOutput);
-                RegisterTask("MoveChemistryStationOutput", "Move chemistry station output", _config.Priorities.MoveChemistryStationOutput, MoveChemistryStationOutput);
-                RegisterTask("MoveCauldronOutput", "Move couldron output", _config.Priorities.MoveCauldronOutput, MoveCauldronOutput);
-                RegisterTask("MoveMixingStationOutput", "Move mix station output", _config.Priorities.MoveMixingStationOutput, MoveMixingStationOutput);
-
-                Logger.Debug("ChemistWorkRoutine", $"{Tasks.Count} tasks for {_chemist.fullName} created.");
-
-                base.RegisterTasks();
-            }
+            RegisterTask("FinishLabOven", "Finish lab oven", 0, FinishLabOven);
+            RegisterTask("StartLabOven", "Start lab oven", 1, StartLabOven);
+            RegisterTask("StartChemistryStation", "Start chemistry station", 2, StartChemistryStation);
+            RegisterTask("StartCauldron", "Start couldron", 3, StartCauldron);
+            RegisterTask("StartMixingStation", "Start mixing station", 4, StartMixingStation);
+            RegisterTask("MoveLabOvenOutput", "Move lab oven output", 5, MoveLabOvenOutput);
+            RegisterTask("MoveChemistryStationOutput", "Move chemistry station output", 6, MoveChemistryStationOutput);
+            RegisterTask("MoveCauldronOutput", "Move couldron output", 7, MoveCauldronOutput);
+            RegisterTask("MoveMixingStationOutput", "Move mix station output", 8, MoveMixingStationOutput);
+            base.RegisterTasks();
         }
 
         public override void UpdateBehaviour()

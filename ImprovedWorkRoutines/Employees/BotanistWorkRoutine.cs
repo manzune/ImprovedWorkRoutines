@@ -26,30 +26,22 @@ namespace ImprovedWorkRoutines.Employees
 {
     public class BotanistWorkRoutine : WorkRoutine
     {
-        private static readonly List<BotanistWorkRoutine> cache = [];
-
-        private readonly BotanistData _config;
-
 #if IL2CPP
         private Botanist _botanist => Employee.Cast<Botanist>();
 #elif MONO
         private Botanist _botanist => Employee as Botanist;
 #endif
 
-        private BotanistWorkRoutine(Botanist botanist) : base(botanist)
-        {
-            _config = SaveConfig.Data.Botanists.Find(x => x.Identifier == botanist.GUID.ToString());
-            _config ??= new(botanist.GUID.ToString(), true);
-        }
+        private BotanistWorkRoutine(Botanist botanist) : base(botanist) { }
 
         public static BotanistWorkRoutine RetrieveOrCreate(Botanist botanist)
         {
-            BotanistWorkRoutine routine = cache.Find(x => x._botanist == botanist);
+            BotanistWorkRoutine routine = GetCachedRoutine<BotanistWorkRoutine>(botanist);
 
             if (routine == null)
             {
                 routine = new(botanist);
-                cache.Add(routine);
+                Cache.Add(routine);
             }
 
             return routine;
@@ -57,50 +49,26 @@ namespace ImprovedWorkRoutines.Employees
 
         public static bool Exists(Botanist botanist)
         {
-            return cache.Any(x => x._botanist == botanist);
-        }
-
-        public static void ClearCache()
-        {
-            for (int i = cache.Count - 1; i >=0; i--)
-            {
-                cache[i].Destroy();
-            }
-
-            Logger.Debug("BotanistWorkRoutine", $"Cache cleared");
-        }
-
-        public void Destroy()
-        {
-            SaveConfig.Data.Botanists.Remove(_config);
-            cache.Remove(this);
-
-            Logger.Debug("BotanistWorkRoutine", $"Routine for {_botanist.fullName} destroyed.");
+            return GetCachedRoutine<BotanistWorkRoutine>(botanist) != null;
         }
 
         protected override void RegisterTasks()
         {
-            if (!TasksCreated && _config != null)
-            {
-                RegisterTask("WaterPot", "Water pot", _config.Priorities.WaterPot, WaterPot);
-                RegisterTask("MistMushroomBed", "Mist mushroom bed", _config.Priorities.MistMushroomBed, MistMushroomBed);
-                RegisterTask("AddSoilToGrowContainer", "Add soil to grow container", _config.Priorities.AddSoilToGrowContainer, AddSoilToGrowContainer);
-                RegisterTask("SowSeedInPot", "Sow seed in pot", _config.Priorities.SowSeedInPot, SowSeedInPot);
-                RegisterTask("ApplySpawnToMushroomBed", "Apply spawn to mushroom bed", _config.Priorities.ApplySpawnToMushroomBed, ApplySpawnToMushroomBed);
-                RegisterTask("ApplyAdditiveToGrowContainer", "Apply additive to grow container", _config.Priorities.ApplyAdditiveToGrowContainer, ApplyAdditiveToGrowContainer);
-                RegisterTask("HarvestPot", "Harvest pot", _config.Priorities.HarvestPot, HarvestPot);
-                RegisterTask("HarvestMushroomBed", "Harvest mushroom bed", _config.Priorities.HarvestMushroomBed, HarvestMushroomBed);
-                RegisterTask("StopDryingRack", "Stop drying rack", _config.Priorities.StopDryingRack, StopDryingRack);
-                RegisterTask("MoveDryingRackOutput", "Move drying rack output", _config.Priorities.MoveDryingRackOutput, MoveDryingRackOutput);
-                RegisterTask("UseSpawnStation", "Use spawn station", _config.Priorities.UseSpawnStation, UseSpawnStation);
-                RegisterTask("MoveSpawnStationOutput", "Move spawn station output", _config.Priorities.MoveSpawnStationOutput, MoveSpawnStationOutput);
-                RegisterTask("MoveDryableToRack", "Move dryable to rack", _config.Priorities.MoveDryableToRack, MoveDryableToRack);
-                RegisterTask("StartDryingRack", "Start drying rack", _config.Priorities.StartDryingRack, StartDryingRack);
-
-                Logger.Debug("BotanistWorkRoutine", $"{Tasks.Count} tasks for {_botanist.fullName} created.");
-
-                base.RegisterTasks();
-            }
+            RegisterTask("WaterPot", "Water pot", 0, WaterPot);
+            RegisterTask("MistMushroomBed", "Mist mushroom bed", 1, MistMushroomBed);
+            RegisterTask("AddSoilToGrowContainer", "Add soil to grow container", 2, AddSoilToGrowContainer);
+            RegisterTask("SowSeedInPot", "Sow seed in pot", 3, SowSeedInPot);
+            RegisterTask("ApplySpawnToMushroomBed", "Apply spawn to mushroom bed", 4, ApplySpawnToMushroomBed);
+            RegisterTask("ApplyAdditiveToGrowContainer", "Apply additive to grow container", 5, ApplyAdditiveToGrowContainer);
+            RegisterTask("HarvestPot", "Harvest pot", 6, HarvestPot);
+            RegisterTask("HarvestMushroomBed", "Harvest mushroom bed", 7, HarvestMushroomBed);
+            RegisterTask("StopDryingRack", "Stop drying rack", 8, StopDryingRack);
+            RegisterTask("MoveDryingRackOutput", "Move drying rack output", 9, MoveDryingRackOutput);
+            RegisterTask("UseSpawnStation", "Use spawn station", 10, UseSpawnStation);
+            RegisterTask("MoveSpawnStationOutput", "Move spawn station output", 11, MoveSpawnStationOutput);
+            RegisterTask("MoveDryableToRack", "Move dryable to rack", 12, MoveDryableToRack);
+            RegisterTask("StartDryingRack", "Start drying rack", 13, StartDryingRack);
+            base.RegisterTasks();
         }
         
         public override void UpdateBehaviour()

@@ -2,12 +2,12 @@
 {
     public static class ModInfo
     {
-        public const string Name = "ImprovedWorkRoutines";
+        public const string NAME = "ImprovedWorkRoutines";
 
-        public const string Version = "0.2.0";
+        public const string VERSION = "0.2.0";
 
-        public const string Author = "ManZune";
+        public const string AUTHOR = "ManZune";
 
-        public const string DownloadLink = "https://github.com/manzune/ImprovedWorkRoutines";
+        public const string DOWNLOAD_LINK = "https://github.com/manzune/ImprovedWorkRoutines";
     }
 }

@@ -2,7 +2,7 @@
 using ImprovedWorkRoutines.Persistence;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(ImprovedWorkRoutines.ImprovedWorkRoutines), $"{ModInfo.Name}", ModInfo.Version, ModInfo.Author, ModInfo.DownloadLink)]
+[assembly: MelonInfo(typeof(ImprovedWorkRoutines.ImprovedWorkRoutines), $"{ModInfo.NAME}", ModInfo.VERSION, ModInfo.AUTHOR, ModInfo.DownloadLink)]
 [assembly: MelonGame("TVGS", "Schedule I")]
 [assembly: MelonColor(255, 224, 138, 72)]
 #if IL2CPP
@@ -23,7 +23,7 @@ namespace ImprovedWorkRoutines
             {
                 ModConfig.Initialize();
 
-                Utils.Logger.Msg($"{ModInfo.Name} v{ModInfo.Version} initialized");
+                Utils.Logger.Msg($"{ModInfo.NAME} v{ModInfo.VERSION} initialized");
 
                 IsInitialized = true;
             }

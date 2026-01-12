@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.Events;
+using ImprovedWorkRoutines.Employees;
+
 
 #if IL2CPP
 using Il2CppScheduleOne.DevUtilities;
@@ -25,7 +27,7 @@ namespace ImprovedWorkRoutines.Persistence
 
         public static DataWrapper Data { get; private set; }
 
-        private static string FilePath => Path.Combine(Singleton<LoadManager>.Instance.ActiveSaveInfo.SavePath, $"{ModInfo.Name}.json");
+        private static string FilePath => Path.Combine(Singleton<LoadManager>.Instance.ActiveSaveInfo.SavePath, $"{ModInfo.NAME}.json");
 
         public static void LoadConfig()
         {
@@ -38,9 +40,7 @@ namespace ImprovedWorkRoutines.Persistence
             {
                 Data = new()
                 {
-                    Botanists = [],
-                    Chemists = [],
-                    Packagers = []
+                    Employees = []
                 };
             }
 
@@ -58,6 +58,19 @@ namespace ImprovedWorkRoutines.Persistence
 
         private static void OnSaveComplete()
         {
+            Data = new()
+            {
+                Employees = []
+            };
+
+            foreach (WorkRoutine routine in WorkRoutine.GetAllRoutines())
+            {
+                EmployeeData employee = new(routine.Employee.GUID.ToString();
+                employee.Tasks = routine.FetchTasksData();
+
+                Data.Employees.Add(employee);
+            }
+
             string text = JsonConvert.SerializeObject(Data, JsonSerializerSettings);
             File.WriteAllText(FilePath, text);
 
@@ -66,11 +79,7 @@ namespace ImprovedWorkRoutines.Persistence
 
         public struct DataWrapper
         {
-            public List<BotanistData> Botanists;
-
-            public List<ChemistData> Chemists;
-
-            public List<PackagerData> Packagers;
+            public List<EmployeeData> Employees;
         }
     }
 }

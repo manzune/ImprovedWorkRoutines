@@ -22,30 +22,22 @@ namespace ImprovedWorkRoutines.Employees
 {
     public class PackagerWorkRoutine : WorkRoutine
     {
-        private static readonly List<PackagerWorkRoutine> cache = [];
-
-        private readonly PackagerData _config;
-
 #if IL2CPP
         private Packager _packager => Employee.Cast<Packager>();
 #elif MONO
         private Packager _packager => Employee as Packager;
 #endif
 
-        private PackagerWorkRoutine(Packager chemist) : base(chemist)
-        {
-            _config = SaveConfig.Data.Packagers.Find(x => x.Identifier == chemist.GUID.ToString());
-            _config ??= new(chemist.GUID.ToString(), true);
-        }
+        private PackagerWorkRoutine(Packager chemist) : base(chemist) { }
 
-        public static PackagerWorkRoutine RetrieveOrCreate(Packager chemist)
+        public static PackagerWorkRoutine RetrieveOrCreate(Packager packager)
         {
-            PackagerWorkRoutine routine = cache.Find(x => x._packager == chemist);
+            PackagerWorkRoutine routine = GetCachedRoutine<PackagerWorkRoutine>(packager);
 
             if (routine == null)
             {
-                routine = new(chemist);
-                cache.Add(routine);
+                routine = new(packager);
+                Cache.Add(routine);
             }
 
             return routine;
@@ -53,41 +45,17 @@ namespace ImprovedWorkRoutines.Employees
 
         public static bool Exists(Packager packager)
         {
-            return cache.Any(x => x._packager == packager);
-        }
-
-        public static void ClearCache()
-        {
-            for (int i = cache.Count - 1; i >= 0; i--)
-            {
-                cache[i].Destroy();
-            }
-
-            Logger.Debug("PackagerWorkRoutine", $"Cache cleared");
-        }
-
-        public void Destroy()
-        {
-            SaveConfig.Data.Packagers.Remove(_config);
-            cache.Remove(this);
-
-            Logger.Debug("PackagerWorkRoutine", $"Routine for {_packager.fullName} destroyed.");
+            return GetCachedRoutine<PackagerWorkRoutine>(packager) != null;
         }
 
         protected override void RegisterTasks()
         {
-            if (!TasksCreated && _config != null)
-            {
-                RegisterTask("StartPackaging", "Start packaging", _config.Priorities.StartPackaging, StartPackaging);
-                RegisterTask("StartBrickPress", "Start brick press", _config.Priorities.StartBrickPress, StartBrickPress);
-                RegisterTask("MovePackagingStationItems", "Move packaging station items", _config.Priorities.MovePackagingStationItems, MovePackagingStationItems);
-                RegisterTask("MoveBrickPressItems", "Move brick press items", _config.Priorities.MoveBrickPressItems, MoveBrickPressItems);
-                RegisterTask("HandleTransitRoute", "Handle transit route", _config.Priorities.HandleTransitRoute, HandleTransitRoute);
-
-                Logger.Debug("PackagerWorkRoutine", $"{Tasks.Count} tasks for {_packager.fullName} created.");
-
-                base.RegisterTasks();
-            }
+            RegisterTask("StartPackaging", "Start packaging", 0, StartPackaging);
+            RegisterTask("StartBrickPress", "Start brick press", 1, StartBrickPress);
+            RegisterTask("MovePackagingStationItems", "Move packaging station items", 2, MovePackagingStationItems);
+            RegisterTask("MoveBrickPressItems", "Move brick press items", 3, MoveBrickPressItems);
+            RegisterTask("HandleTransitRoute", "Handle transit route", 4, HandleTransitRoute);
+            base.RegisterTasks();
         }
 
         public override void UpdateBehaviour()

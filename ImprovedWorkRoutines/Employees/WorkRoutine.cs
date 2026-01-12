@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ImprovedWorkRoutines.Utils;
+using System;
+using ImprovedWorkRoutines.Persistence;
+using ImprovedWorkRoutines.Persistence.Datas;
 
 #if IL2CPP
 using Il2CppFishNet;
@@ -20,30 +23,78 @@ namespace ImprovedWorkRoutines.Employees
     {
         public delegate bool TaskCallback();
 
-        protected readonly Employee Employee;
+        protected static readonly List<WorkRoutine> Cache = [];
+
+        public static readonly Action<WorkRoutine> OnTasksRegistered;
+
+        public readonly Employee Employee;
 
         protected readonly SortedDictionary<string, (string description, int priority, TaskCallback callback)> Tasks = [];
 
+        protected EmployeeData Config;
+
         protected bool TasksCreated;
 
-        public WorkRoutine(Employee employee)
+        protected WorkRoutine(Employee employee)
         {
             Employee = employee;
 
+            Config = SaveConfig.Data.Employees.Find(x => x.Identifier == employee.GUID.ToString());
+            Config ??= new(employee.GUID.ToString(), true);
+
             RegisterTasks();
 
-            Logger.Debug("WorkRoutine", $"Routine for {Employee.fullName} created.");
+            Logger.Debug($"Routine for {Employee.fullName} created.");
         }
 
-        public void RegisterTask(string identifier, string description, int priority, TaskCallback callback)
+        public static void ClearCache()
+        {
+            for (int i = Cache.Count - 1; i >= 0; i--)
+            {
+                Cache[i].Destroy();
+            }
+
+            Logger.Debug($"Routines cache cleared");
+        }
+
+        public static List<WorkRoutine> GetAllRoutines()
+        {
+            return Cache;
+        }
+
+        protected static T GetCachedRoutine<T>(Employee employee) where T : WorkRoutine
+        {
+            return Cache.Find(x => x.Employee == employee) as T;
+        }
+
+        public void Destroy()
+        {
+            SaveConfig.Data.Employees.Remove(Config);
+            Cache.Remove(this);
+
+            Logger.Debug($"Routine for {Employee.fullName} destroyed.");
+        }
+
+        public void RegisterTask(string identifier, string description, int defaultPriority, TaskCallback callback)
         {
             if (!Tasks.Any(t => t.Key == identifier))
             {
+                int priority;
+
+                if (Config.Tasks.TryGetValue(identifier, out var task))
+                {
+                    priority = task.priority;
+                }
+                else
+                {
+                    priority = defaultPriority;
+                }
+
                 Tasks.Add(identifier, (description, priority, callback));
             }
             else
             {
-               Utils.Logger.Error($"Could not register already registered task: {identifier}");
+               Logger.Error($"Could not register already registered task: {identifier}");
             }
         }
 
@@ -69,7 +120,7 @@ namespace ImprovedWorkRoutines.Employees
             }
             else
             {
-               Utils.Logger.Error($"Could not edit non existent task: {identifier}");
+               Logger.Error($"Could not edit non existent task: {identifier}");
             }
         }
 
@@ -77,18 +128,20 @@ namespace ImprovedWorkRoutines.Employees
         {
             if (!Tasks.Remove(identifier))
             {
-                Utils.Logger.Error($"Could not remove non existent task: {identifier}");
+                Logger.Error($"Could not remove non existent task: {identifier}");
             }
         }
 
-        protected Dictionary<string, (string description, int priority, TaskCallback callback)> GetTasksByPriority()
+        public virtual Dictionary<string, (string type, int priority)> FetchTasksData()
         {
-            return Tasks.OrderBy(t => t.Value.priority).ToDictionary(t => t.Key, t => t.Value);
-        }
+            Dictionary<string, (string type, int priority)> tasksData = [];
 
-        protected virtual void RegisterTasks()
-        {
-            TasksCreated = true;
+            foreach (KeyValuePair<string, (string description, int priority, TaskCallback callback)> task in Tasks)
+            {
+                tasksData.Add(task.Key, (GetType().ToString(), task.Value.priority));
+            }
+
+            return tasksData;
         }
 
         public virtual void UpdateBehaviour()
@@ -101,7 +154,7 @@ namespace ImprovedWorkRoutines.Employees
 
                 if (started)
                 {
-                    Logger.Debug("WorkRoutine", $"Task for {Employee.fullName} started: {Tasks.ElementAt(i).Key}");
+                    Logger.Debug($"Task for {Employee.fullName} started: {Tasks.ElementAt(i).Key}");
                     break;
                 }
             }
@@ -111,6 +164,18 @@ namespace ImprovedWorkRoutines.Employees
                 Employee.SubmitNoWorkReason("There's nothing for me to do right now.", string.Empty);
                 Employee.SetIdle(true);
             }
+        }
+
+        protected Dictionary<string, (string description, int priority, TaskCallback callback)> GetTasksByPriority()
+        {
+            return Tasks.OrderBy(t => t.Value.priority).ToDictionary(t => t.Key, t => t.Value);
+        }
+
+        protected virtual void RegisterTasks()
+        {
+            OnTasksRegistered?.Invoke(this);
+
+            Logger.Debug($"{Tasks.Count} tasks for {Employee.fullName} registered.");
         }
 
         protected void CheckWorkConditions()
@@ -127,7 +192,7 @@ namespace ImprovedWorkRoutines.Employees
                 canWork = false;
                 Employee.SubmitNoWorkReason("I haven't been assigned a locker", "You can use your management clipboard to assign me a locker.");
             }
-            else if (NetworkSingleton<TimeManager>.Instance.IsEndOfDay)
+            else if (!ModConfig.WorkAllDay && NetworkSingleton<TimeManager>.Instance.IsEndOfDay)
             {
                 canWork = false;
                 Employee.SubmitNoWorkReason("Sorry boss, my shift ends at 4AM.", string.Empty);

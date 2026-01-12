@@ -22,6 +22,12 @@ namespace ImprovedWorkRoutines
             set => generalCategory.GetEntry<bool>("Debug").Value = value;
         }
 
+        public static bool WorkAllDay
+        {
+            get => generalCategory.GetEntry<bool>("WorkAllDay").Value;
+            set => generalCategory.GetEntry<bool>("WorkAllDay").Value = value;
+        }
+
         public struct Botanist
         {
             public static bool ReorderTasks
@@ -65,12 +71,12 @@ namespace ImprovedWorkRoutines
         {
             if (isInitialized) return;
 
-            generalCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_01_General", $"{ModInfo.Name} - General Settings", false, true);
-            botanistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_02_Botanist", $"{ModInfo.Name} - Botanist Settings", false, true);
-            chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_03_Chemist", $"{ModInfo.Name} - Chemist Settings", false, true);
-            packagerCategory = MelonPreferences.CreateCategory($"{ModInfo.Name}_04_Packager", $"{ModInfo.Name} - Packager Settings", false, true);
+            generalCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_01_General", $"{ModInfo.NAME} - General Settings", false, true);
+            botanistCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_02_Botanist", $"{ModInfo.NAME} - Botanist Settings", false, true);
+            chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_03_Chemist", $"{ModInfo.NAME} - Chemist Settings", false, true);
+            packagerCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_04_Packager", $"{ModInfo.NAME} - Packager Settings", false, true);
 
-            string path = Path.Combine(MelonEnvironment.UserDataDirectory, $"{ModInfo.Name}.cfg");
+            string path = Path.Combine(MelonEnvironment.UserDataDirectory, $"{ModInfo.NAME}.cfg");
 
             generalCategory.SetFilePath(path, true, false);
             botanistCategory.SetFilePath(path, true, false);
@@ -119,6 +125,14 @@ namespace ImprovedWorkRoutines
                 default_value: false,
                 display_name: "Enable Debug Mode",
                 description: "Enables debugging for this mod",
+                is_hidden: false
+            );
+            generalCategory.CreateEntry<bool>
+            (
+                identifier: "WorkAllDay",
+                default_value: false,
+                display_name: "Employees Work All Day",
+                description: "Skip the 4AM shift end",
                 is_hidden: false
             );
 
