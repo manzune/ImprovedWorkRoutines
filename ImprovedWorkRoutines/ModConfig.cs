@@ -76,7 +76,7 @@ namespace ImprovedWorkRoutines
             chemistCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_03_Chemist", $"{ModInfo.NAME} - Chemist Settings", false, true);
             packagerCategory = MelonPreferences.CreateCategory($"{ModInfo.NAME}_04_Packager", $"{ModInfo.NAME} - Packager Settings", false, true);
 
-            string path = Path.Combine(MelonEnvironment.UserDataDirectory, $"{ModInfo.NAME}.cfg");
+            string path = Path.Combine(MelonEnvironment.UserDataDirectory, ModInfo.NAME, $"{ModInfo.NAME}.cfg");
 
             generalCategory.SetFilePath(path, true, false);
             botanistCategory.SetFilePath(path, true, false);

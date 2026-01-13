@@ -44,7 +44,7 @@ namespace ImprovedWorkRoutines.Employees
 
             RegisterTasks();
 
-            Logger.Debug($"Routine for {Employee.fullName} created.");
+            Logger.Msg($"Routine for {Employee.fullName} ready.");
         }
 
         public static void ClearCache()
@@ -79,15 +79,11 @@ namespace ImprovedWorkRoutines.Employees
         {
             if (!Tasks.Any(t => t.Key == identifier))
             {
-                int priority;
+                int priority = defaultPriority;
 
-                if (Config.Tasks.TryGetValue(identifier, out var task))
+                if (Config.Tasks.TryGetValue(identifier, out var value))
                 {
-                    priority = task.priority;
-                }
-                else
-                {
-                    priority = defaultPriority;
+                    priority = value;
                 }
 
                 Tasks.Add(identifier, (description, priority, callback));
@@ -132,13 +128,13 @@ namespace ImprovedWorkRoutines.Employees
             }
         }
 
-        public virtual Dictionary<string, (string type, int priority)> FetchTasksData()
+        public virtual Dictionary<string, int> FetchTasksData()
         {
-            Dictionary<string, (string type, int priority)> tasksData = [];
+            Dictionary<string, int> tasksData = [];
 
             foreach (KeyValuePair<string, (string description, int priority, TaskCallback callback)> task in Tasks)
             {
-                tasksData.Add(task.Key, (GetType().ToString(), task.Value.priority));
+                tasksData.Add(task.Key, task.Value.priority);
             }
 
             return tasksData;

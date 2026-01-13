@@ -57,6 +57,9 @@
 		<Reference Include="UnityEngine.TextRenderingModule">
 			<HintPath>$(Il2CppAssemblyPath)\UnityEngine.TextRenderingModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.ImageConversionModule">
+			<HintPath>$(Il2CppAssemblyPath)\UnityEngine.ImageConversionModule.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>$(Il2CppAssemblyPath)\UnityEngine.UI.dll</HintPath>
 		</Reference>
@@ -87,6 +90,9 @@
 		</Reference>
 		<Reference Include="UnityEngine.TextRenderingModule">
 			<HintPath>$(MonoAssemblyPath)\UnityEngine.TextRenderingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ImageConversionModule">
+			<HintPath>$(MonoAssemblyPath)\UnityEngine.ImageConversionModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>$(MonoAssemblyPath)\UnityEngine.UI.dll</HintPath>

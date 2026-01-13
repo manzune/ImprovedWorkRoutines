@@ -27,10 +27,14 @@ namespace ImprovedWorkRoutines.Persistence
 
         public static DataWrapper Data { get; private set; }
 
+        public static bool IsLoaded { get; private set; }
+
         private static string FilePath => Path.Combine(Singleton<LoadManager>.Instance.ActiveSaveInfo.SavePath, $"{ModInfo.NAME}.json");
 
         public static void LoadConfig()
         {
+            IsLoaded = true;
+
             if (File.Exists(FilePath))
             {
                 string text = File.ReadAllText(FilePath);
@@ -46,14 +50,17 @@ namespace ImprovedWorkRoutines.Persistence
 
             Singleton<SaveManager>.Instance.onSaveComplete.AddListener((UnityAction)OnSaveComplete);
 
-            Utils.Logger.Debug($"Config for SaveGame_{Singleton<LoadManager>.Instance.ActiveSaveInfo.SaveSlotNumber} loaded");
+            Utils.Logger.Msg($"Config for SaveGame_{Singleton<LoadManager>.Instance.ActiveSaveInfo.SaveSlotNumber} loaded.");
         }
 
         public static void ClearConfig()
         {
+            IsLoaded = false;
             Data = default;
 
             Singleton<SaveManager>.Instance.onSaveComplete.RemoveListener((UnityAction)OnSaveComplete);
+
+            Utils.Logger.Msg($"Config cleared.");
         }
 
         private static void OnSaveComplete()
@@ -65,7 +72,7 @@ namespace ImprovedWorkRoutines.Persistence
 
             foreach (WorkRoutine routine in WorkRoutine.GetAllRoutines())
             {
-                EmployeeData employee = new(routine.Employee.GUID.ToString();
+                EmployeeData employee = new(routine.Employee.GUID.ToString());
                 employee.Tasks = routine.FetchTasksData();
 
                 Data.Employees.Add(employee);
@@ -74,7 +81,7 @@ namespace ImprovedWorkRoutines.Persistence
             string text = JsonConvert.SerializeObject(Data, JsonSerializerSettings);
             File.WriteAllText(FilePath, text);
 
-            Utils.Logger.Debug($"Config for SaveGame_{Singleton<LoadManager>.Instance.ActiveSaveInfo.SaveSlotNumber} saved");
+            Utils.Logger.Msg($"Config for SaveGame_{Singleton<LoadManager>.Instance.ActiveSaveInfo.SaveSlotNumber} saved.");
         }
 
         public struct DataWrapper

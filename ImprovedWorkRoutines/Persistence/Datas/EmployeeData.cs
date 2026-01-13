@@ -4,7 +4,7 @@ namespace ImprovedWorkRoutines.Persistence.Datas
 {
     public class EmployeeData : DataBase
     {
-        public Dictionary<string, (string type, int priority)> Tasks;
+        public Dictionary<string, int> Tasks;
 
         public EmployeeData(string identifier, bool loadDefaults = false) : base(identifier)
         {

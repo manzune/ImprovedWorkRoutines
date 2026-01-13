@@ -1,8 +1,9 @@
 ﻿using ImprovedWorkRoutines;
 using ImprovedWorkRoutines.Persistence;
+using ImprovedWorkRoutines.UI;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(ImprovedWorkRoutines.ImprovedWorkRoutines), $"{ModInfo.NAME}", ModInfo.VERSION, ModInfo.AUTHOR, ModInfo.DownloadLink)]
+[assembly: MelonInfo(typeof(ImprovedWorkRoutines.ImprovedWorkRoutines), $"{ModInfo.NAME}", ModInfo.VERSION, ModInfo.AUTHOR, ModInfo.DOWNLOAD_LINK)]
 [assembly: MelonGame("TVGS", "Schedule I")]
 [assembly: MelonColor(255, 224, 138, 72)]
 #if IL2CPP
@@ -31,11 +32,12 @@ namespace ImprovedWorkRoutines
 
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
-            if (sceneName == "Menu")
+            if (sceneName == "Menu" && SaveConfig.IsLoaded)
             {
+                EmployeeManagerApp.Instance?.Destroy();
                 SaveConfig.ClearConfig();
             }
-            else if (sceneName == "Main")
+            else if (sceneName == "Main" && !SaveConfig.IsLoaded)
             {
                 SaveConfig.LoadConfig();
             }
